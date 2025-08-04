@@ -218,11 +218,11 @@ docker run -d --env-file .env -p 5000:5000 -v lunchmoney_data:/app/data lunchmon
 
 For production environments, the Docker setup includes:
 
-- **Multi-stage builds** for optimized image size
-- **Non-root user** for security
-- **Health checks** for monitoring
-- **Volume persistence** for memory data
-- **Graceful shutdown** handling
+* **Multi-stage builds** for optimized image size
+* **Non-root user** for security
+* **Health checks** for monitoring
+* **Volume persistence** for memory data
+* **Graceful shutdown** handling
 
 ### Kubernetes
 

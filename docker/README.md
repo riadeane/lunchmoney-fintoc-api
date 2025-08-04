@@ -5,17 +5,20 @@ This directory contains Docker configuration for running the Lunchmoney-Fintoc s
 ## Quick Start
 
 1. **Set up environment variables:**
+
    ```bash
    cp .env.example .env
    # Edit .env with your API credentials
    ```
 
 2. **Run the server:**
+
    ```bash
    ./docker/docker-run.sh
    ```
 
 3. **Run CLI commands:**
+
    ```bash
    ./docker/docker-run.sh --cli --dry-run
    ```
@@ -90,11 +93,13 @@ docker run --rm \
 All environment variables can be set in `.env` file:
 
 ### Required
+
 - `LUNCHMONEY_TOKEN` - Your Lunch Money API token
 - `FINTOC_API_KEY` - Your Fintoc API key  
 - `FINTOC_LINK_ID` - Your Fintoc link/account ID
 
 ### Optional
+
 - `LUNCHMONEY_ASSET_ID` - Lunch Money asset ID for transactions
 - `DAYS_TO_SYNC=7` - Number of days to sync
 - `CURRENCY_CODE=CLP` - Currency code
@@ -174,6 +179,7 @@ volumes:
 ```
 
 Deploy with:
+
 ```bash
 docker stack deploy -c docker-stack.yml lunchmoney-stack
 ```
@@ -243,6 +249,7 @@ spec:
 ### Common Issues
 
 1. **Container fails to start**
+
    ```bash
    # Check logs
    docker logs lunchmoney-sync
@@ -252,6 +259,7 @@ spec:
    ```
 
 2. **Memory not persisting**
+
    ```bash
    # Verify volume mount
    docker inspect lunchmoney-sync
@@ -261,6 +269,7 @@ spec:
    ```
 
 3. **API connectivity issues**
+
    ```bash
    # Test health endpoint
    curl http://localhost:5000/health
