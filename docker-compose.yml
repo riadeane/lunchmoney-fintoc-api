@@ -1,0 +1,76 @@
+version: "3.8"
+
+services:
+  lunchmoney-fintoc-sync:
+    build: .
+    container_name: lunchmoney-fintoc-sync
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      # Required environment variables - set these in .env file
+      - LUNCHMONEY_TOKEN=${LUNCHMONEY_TOKEN}
+      - FINTOC_API_KEY=${FINTOC_API_KEY}
+      - FINTOC_LINK_ID=${FINTOC_LINK_ID}
+
+      # Optional environment variables
+      - LUNCHMONEY_ASSET_ID=${LUNCHMONEY_ASSET_ID:-}
+      - DAYS_TO_SYNC=${DAYS_TO_SYNC:-7}
+      - CURRENCY_CODE=${CURRENCY_CODE:-CLP}
+      - PORT=5000
+
+      # Node.js environment
+      - NODE_ENV=production
+    volumes:
+      # Persist memory and configuration data
+      - memory_data:/app/data
+      - ./config.json:/app/config.json:ro
+    env_file:
+      - .env
+    networks:
+      - lunchmoney-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lunchmoney-sync.rule=Host(`lunchmoney-sync.localhost`)"
+      - "traefik.http.services.lunchmoney-sync.loadbalancer.server.port=5000"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:5000/health', (res) => process.exit(res.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: CLI runner for one-off syncs
+  lunchmoney-fintoc-cli:
+    build: .
+    container_name: lunchmoney-fintoc-cli
+    profiles: ["cli"]
+    environment:
+      - LUNCHMONEY_TOKEN=${LUNCHMONEY_TOKEN}
+      - FINTOC_API_KEY=${FINTOC_API_KEY}
+      - FINTOC_LINK_ID=${FINTOC_LINK_ID}
+      - LUNCHMONEY_ASSET_ID=${LUNCHMONEY_ASSET_ID:-}
+      - DAYS_TO_SYNC=${DAYS_TO_SYNC:-7}
+      - CURRENCY_CODE=${CURRENCY_CODE:-CLP}
+    volumes:
+      - memory_data:/app/data
+      - ./config.json:/app/config.json:ro
+    env_file:
+      - .env
+    networks:
+      - lunchmoney-network
+    command: ["node", "bin/cli.js"]
+
+volumes:
+  memory_data:
+    driver: local
+
+networks:
+  lunchmoney-network:
+    driver: bridge

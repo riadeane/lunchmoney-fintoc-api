@@ -1,0 +1,8 @@
+{
+  "currency": "CLP",
+  "days_to_sync": 7,
+  "category_rules": {
+    "Lider": "Groceries",
+    "Starbucks": "Coffee"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "lunchmoney-fintoc-sync",
+  "version": "1.0.0",
+  "description": "CLI tool to sync Fintoc transactions to Lunch Money",
+  "bin": {
+    "lunchmoney-fintoc-sync": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "sync": "node bin/cli.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^4.1.2",
+    "commander": "^10.0.0",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "node-cron": "^3.0.3"
+  }
+}
