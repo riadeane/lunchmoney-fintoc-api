@@ -42,12 +42,14 @@ function loadConfig() {
 
   return {
     lunchmoneyToken: process.env.LUNCHMONEY_TOKEN,
-    finocApiKey: process.env.FINTOC_API_KEY,
-    finocLinkId: process.env.FINTOC_LINK_ID,
     currency: process.env.CURRENCY_CODE || defaults.currency,
     daysToSync: parseInt(process.env.DAYS_TO_SYNC || defaults.days_to_sync, 10),
     categoryRules: defaults.category_rules,
-    lunchmoneyAssetId: process.env.LUNCHMONEY_ASSET_ID || process.env.LM_ASSET_ID || null
+    lunchmoneyAssetId: process.env.LUNCHMONEY_ASSET_ID || process.env.LM_ASSET_ID || null,
+    gmailClientId: process.env.GMAIL_CLIENT_ID || null,
+    gmailClientSecret: process.env.GMAIL_CLIENT_SECRET || null,
+    gmailRefreshToken: process.env.GMAIL_REFRESH_TOKEN || null,
+    gmailUser: process.env.GMAIL_USER || 'me'
   };
 }
 

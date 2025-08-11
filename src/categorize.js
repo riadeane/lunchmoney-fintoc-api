@@ -115,7 +115,7 @@ function sanitizePayee(payee) {
  * Enhanced category assignment with fuzzy matching and learning
  *
  * @param {string} token Lunch Money API token.
- * @param {string} payee Payee or description from Fintoc.
+ * @param {string} payee Payee or description from the transaction source.
  * @param {Object<string,string>} categoryRules Mapping of search strings to category names.
  * @returns {Promise<number|null>} Category ID or null if no match found.
  */

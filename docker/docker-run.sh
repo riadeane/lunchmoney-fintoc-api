@@ -8,7 +8,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}🐳 Lunchmoney-Fintoc Sync Docker Runner${NC}"
+echo -e "${BLUE}🐳 Lunchmoney Gmail Sync Docker Runner${NC}"
 echo "========================================"
 
 # Check if .env file exists
@@ -23,12 +23,13 @@ fi
 
 # Check if required variables are set
 source .env
-if [ -z "$LUNCHMONEY_TOKEN" ] || [ -z "$FINTOC_API_KEY" ] || [ -z "$FINTOC_LINK_ID" ]; then
+if [ -z "$LUNCHMONEY_TOKEN" ] || [ -z "$GMAIL_CLIENT_ID" ] || [ -z "$GMAIL_CLIENT_SECRET" ] || [ -z "$GMAIL_REFRESH_TOKEN" ]; then
     echo -e "${RED}❌ Error: Required environment variables not set${NC}"
     echo "Please ensure your .env file contains:"
     echo "  LUNCHMONEY_TOKEN=your_token"
-    echo "  FINTOC_API_KEY=your_key"
-    echo "  FINTOC_LINK_ID=your_link_id"
+    echo "  GMAIL_CLIENT_ID=your_client_id"
+    echo "  GMAIL_CLIENT_SECRET=your_client_secret"
+    echo "  GMAIL_REFRESH_TOKEN=your_refresh_token"
     exit 1
 fi
 

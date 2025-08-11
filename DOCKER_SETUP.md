@@ -1,6 +1,6 @@
 # 🐳 Docker Setup Complete
 
-Your Lunchmoney-Fintoc Sync system has been successfully dockerized with enterprise-grade features.
+Your Lunchmoney Gmail Sync system has been successfully dockerized with enterprise-grade features.
 
 ## 🚀 What's Been Implemented
 
@@ -99,7 +99,7 @@ Returns:
   "uptime": 3600,
   "checks": [
     {"service": "lunch_money", "status": "healthy"},
-    {"service": "fintoc", "status": "healthy"}
+    {"service": "gmail", "status": "healthy"}
   ]
 }
 ```
@@ -111,8 +111,9 @@ Returns:
 ```bash
 # Required
 LUNCHMONEY_TOKEN=your_token
-FINTOC_API_KEY=your_key  
-FINTOC_LINK_ID=your_link_id
+GMAIL_CLIENT_ID=your_client_id
+GMAIL_CLIENT_SECRET=your_client_secret
+GMAIL_REFRESH_TOKEN=your_refresh_token
 
 # Optional
 LUNCHMONEY_ASSET_ID=123
@@ -205,7 +206,7 @@ kubectl logs -f deployment/lunchmoney-fintoc-sync -n lunchmoney-sync
 docker run --rm -it --env-file .env lunchmoney-fintoc-sync sh
 
 # Test connectivity
-docker exec lunchmoney-sync wget -qO- https://api.fintoc.com/v1/health
+docker exec lunchmoney-sync curl -s https://www.google.com > /dev/null
 ```
 
 ## 🚀 Production Best Practices

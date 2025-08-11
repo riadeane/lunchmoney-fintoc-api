@@ -1,6 +1,6 @@
-# Docker Setup for Lunchmoney-Fintoc Sync
+# Docker Setup for Lunchmoney Gmail Sync
 
-This directory contains Docker configuration for running the Lunchmoney-Fintoc sync system in containers.
+This directory contains Docker configuration for running the Lunchmoney Gmail sync system in containers.
 
 ## Quick Start
 
@@ -95,8 +95,9 @@ All environment variables can be set in `.env` file:
 ### Required
 
 - `LUNCHMONEY_TOKEN` - Your Lunch Money API token
-- `FINTOC_API_KEY` - Your Fintoc API key  
-- `FINTOC_LINK_ID` - Your Fintoc link/account ID
+- `GMAIL_CLIENT_ID` - Google OAuth client ID
+- `GMAIL_CLIENT_SECRET` - Google OAuth client secret
+- `GMAIL_REFRESH_TOKEN` - OAuth refresh token with Gmail scope
 
 ### Optional
 
@@ -160,17 +161,20 @@ services:
       - NODE_ENV=production
     secrets:
       - lunchmoney_token
-      - fintoc_api_key
-      - fintoc_link_id
+      - gmail_client_id
+      - gmail_client_secret
+      - gmail_refresh_token
     volumes:
       - lunchmoney_data:/app/data
 
 secrets:
   lunchmoney_token:
     external: true
-  fintoc_api_key:
+  gmail_client_id:
     external: true
-  fintoc_link_id:
+  gmail_client_secret:
+    external: true
+  gmail_refresh_token:
     external: true
 
 volumes:
@@ -213,16 +217,21 @@ spec:
             secretKeyRef:
               name: lunchmoney-secrets
               key: token
-        - name: FINTOC_API_KEY
+        - name: GMAIL_CLIENT_ID
           valueFrom:
             secretKeyRef:
               name: lunchmoney-secrets
-              key: fintoc-key
-        - name: FINTOC_LINK_ID
+              key: gmail-client-id
+        - name: GMAIL_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               name: lunchmoney-secrets
-              key: fintoc-link
+              key: gmail-client-secret
+        - name: GMAIL_REFRESH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: lunchmoney-secrets
+              key: gmail-refresh-token
         volumeMounts:
         - name: data-volume
           mountPath: /app/data
@@ -275,7 +284,7 @@ spec:
    curl http://localhost:5000/health
    
    # Check network connectivity from container
-   docker exec lunchmoney-sync wget -qO- https://api.fintoc.com/v1/health
+   docker exec lunchmoney-sync curl -s https://www.google.com > /dev/null
    ```
 
 ### Debug Mode

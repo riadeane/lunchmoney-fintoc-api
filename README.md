@@ -1,14 +1,15 @@
-# lunchmoney‑fintoc‑sync
+# lunchmoney‑gmail‑sync
 
-This project provides a production‑ready Node.js solution for synchronising transactions from your Chilean bank via the [Fintoc](https://fintoc.com/) API into the [Lunch Money](https://lunchmoney.app) budget app. It includes both a command‑line interface (CLI) for one‑off syncs and a server for automated scheduling.
+This project provides a production‑ready Node.js solution for synchronising Banco de Chile credit card transactions from Gmail into the [Lunch Money](https://lunchmoney.app) budget app. It includes both a command‑line interface (CLI) for one‑off syncs and a server for automated scheduling.
 
-The original `agucova/lunchmoney‑fintoc` project was written in Rust and served as an early proof of concept.  This fork reimplements the core functionality in JavaScript/Node.js with a focus on ease of configuration, duplicate prevention, auto‑categorisation and automation.
+The original `agucova/lunchmoney‑fintoc` project was written in Rust and served as an early proof of concept. This fork now focuses solely on Gmail ingestion, reimplemented in JavaScript/Node.js with a focus on ease of configuration, duplicate prevention, auto‑categorisation and automation.
 
 ## Features
 
 ### Core Functionality
 
 * **Environment and JSON configuration** – supply your API keys and options either through a `.env` file or a `config.json`.  See the `.env.example` and `config.example.json` files for the available variables.
+* **Gmail email parsing** – optionally read Banco de Chile credit card notification emails from Gmail and turn them into Lunch Money transactions.
 * **Enhanced duplicate prevention** – uses both simple date+amount matching and advanced transaction fingerprinting to prevent duplicates even when transactions are modified.
 * **Intelligent auto‑categorisation** – combines manual rules from `config.json` with AI-like fuzzy matching and learning from your transaction history.
 * **Smart memory learning** – automatically learns category assignments from your existing Lunch Money transaction history with conflict resolution and confidence scoring.
@@ -80,9 +81,21 @@ Create a `.env` file based on `.env.example` and set your API credentials:
 cp .env.example .env
 ```
 
-Fill in your **Lunch Money** API token (`LUNCHMONEY_TOKEN`), your **Fintoc** API key (`FINTOC_API_KEY`), your **Fintoc** account or link ID (`FINTOC_LINK_ID`) and, optionally, the **Lunch Money asset ID** you created for your manually‑managed account (`LUNCHMONEY_ASSET_ID`).  You can also override the default number of days to sync and the currency code.
+Fill in your **Lunch Money** API token (`LUNCHMONEY_TOKEN`) and, optionally, the **Lunch Money asset ID** you created for your manually‑managed account (`LUNCHMONEY_ASSET_ID`). You can also override the default number of days to sync and the currency code.
 
-Optionally, copy `config.example.json` to `config.json` and customise it.  This JSON file lets you specify a longer sync period and define simple category rules:
+To import Banco de Chile credit card notifications from Gmail, provide the following variables:
+
+```bash
+GMAIL_CLIENT_ID=your_google_client_id
+GMAIL_CLIENT_SECRET=your_google_client_secret
+GMAIL_REFRESH_TOKEN=oauth_refresh_token_with_gmail_scope
+# Optional, defaults to the authenticated user
+GMAIL_USER=your@email.com
+```
+
+These credentials are used to query your inbox and parse Banco de Chile notification emails into transactions.
+
+Optionally, copy `config.example.json` to `config.json` and customise it. This JSON file lets you specify a longer sync period and define simple category rules:
 
 ```json
 {
@@ -235,8 +248,9 @@ kubectl apply -f k8s/deployment.yaml
 # Update secrets with your credentials
 kubectl create secret generic lunchmoney-secrets \
   --from-literal=lunchmoney-token=your_token \
-  --from-literal=fintoc-api-key=your_key \
-  --from-literal=fintoc-link-id=your_link_id \
+  --from-literal=gmail-client-id=your_client_id \
+  --from-literal=gmail-client-secret=your_client_secret \
+  --from-literal=gmail-refresh-token=your_refresh_token \
   -n lunchmoney-sync
 ```
 
@@ -247,7 +261,7 @@ See `docker/README.md` for comprehensive Docker documentation.
 The repository includes a preconfigured workflow at `.github/workflows/sync.yml` that runs the sync daily.  To enable it:
 
 1. Go to **Settings → Secrets and variables → Actions** in your GitHub repository.
-2. Add the following secrets with the same names used in `.env.example`: `LUNCHMONEY_TOKEN`, `FINTOC_API_KEY`, `FINTOC_LINK_ID`, `LUNCHMONEY_ASSET_ID`, `DAYS_TO_SYNC` (optional) and `CURRENCY_CODE` (optional).
+2. Add the following secrets with the same names used in `.env.example`: `LUNCHMONEY_TOKEN`, `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`, `LUNCHMONEY_ASSET_ID` (optional), `DAYS_TO_SYNC` (optional) and `CURRENCY_CODE` (optional).
 3. Commit your changes and push to GitHub.  The workflow will run automatically on the schedule defined in the workflow (currently at 03:00 UTC each day).
 
 ## Memory Learning System
@@ -295,7 +309,7 @@ The memory is automatically rebuilt daily when using server mode, ensuring it st
 
 ### API Requirements
 
-* This application uses the [Fintoc List Movements endpoint](https://docs.fintoc.com/reference/movements-list) and the [Lunch Money transactions API](https://lunchmoney.dev/#transactions) to move data.  Make sure your Fintoc link or account ID is correct.
+
 * If you provide a `LUNCHMONEY_ASSET_ID`, new transactions will be associated with that asset.  Otherwise, the transactions will not specify an asset and may appear under your default account.
 
 ### Duplicate Detection
