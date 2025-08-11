@@ -11,8 +11,9 @@ metadata:
 type: Opaque
 stringData:
   lunchmoney-token: "your-lunchmoney-token-here"
-  fintoc-api-key: "your-fintoc-api-key-here"
-  fintoc-link-id: "your-fintoc-link-id-here"
+  gmail-client-id: "your-client-id-here"
+  gmail-client-secret: "your-client-secret-here"
+  gmail-refresh-token: "your-refresh-token-here"
   lunchmoney-asset-id: "123"  # Optional
 ---
 apiVersion: v1
@@ -76,16 +77,21 @@ spec:
             secretKeyRef:
               name: lunchmoney-secrets
               key: lunchmoney-token
-        - name: FINTOC_API_KEY
+        - name: GMAIL_CLIENT_ID
           valueFrom:
             secretKeyRef:
               name: lunchmoney-secrets
-              key: fintoc-api-key
-        - name: FINTOC_LINK_ID
+              key: gmail-client-id
+        - name: GMAIL_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
               name: lunchmoney-secrets
-              key: fintoc-link-id
+              key: gmail-client-secret
+        - name: GMAIL_REFRESH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: lunchmoney-secrets
+              key: gmail-refresh-token
         - name: LUNCHMONEY_ASSET_ID
           valueFrom:
             secretKeyRef:

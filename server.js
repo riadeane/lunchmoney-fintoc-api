@@ -107,18 +107,6 @@ app.get('/health', async (req, res) => {
       });
     }
     
-    // Check Fintoc API connectivity
-    try {
-      await axios.get('https://api.fintoc.com/v1/health', { timeout: 5000 });
-      healthChecks.push({ service: 'fintoc', status: 'healthy' });
-    } catch (err) {
-      healthChecks.push({ 
-        service: 'fintoc', 
-        status: 'unhealthy', 
-        error: err.message 
-      });
-    }
-    
     const allHealthy = healthChecks.every(check => check.status === 'healthy');
     const status = allHealthy ? 'healthy' : 'degraded';
     
@@ -223,7 +211,7 @@ app.post('/rebuild-memory', async (req, res) => {
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    name: 'Lunchmoney-Fintoc Sync Server',
+    name: 'Lunchmoney Sync Server',
     status: 'running',
     version: require('./package.json').version,
     endpoints: {

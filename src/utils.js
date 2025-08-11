@@ -112,7 +112,6 @@ function sanitizeErrorForLogging(error, context = {}) {
   if (sanitizedContext.token) sanitizedContext.token = '[REDACTED]';
   if (sanitizedContext.apiKey) sanitizedContext.apiKey = '[REDACTED]';
   if (sanitizedContext.lunchmoneyToken) sanitizedContext.lunchmoneyToken = '[REDACTED]';
-  if (sanitizedContext.fintocApiKey) sanitizedContext.fintocApiKey = '[REDACTED]';
   
   return {
     message: error.message,

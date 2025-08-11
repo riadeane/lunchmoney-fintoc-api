@@ -10,8 +10,10 @@ services:
     environment:
       # Required environment variables - set these in .env file
       - LUNCHMONEY_TOKEN=${LUNCHMONEY_TOKEN}
-      - FINTOC_API_KEY=${FINTOC_API_KEY}
-      - FINTOC_LINK_ID=${FINTOC_LINK_ID}
+      - GMAIL_CLIENT_ID=${GMAIL_CLIENT_ID}
+      - GMAIL_CLIENT_SECRET=${GMAIL_CLIENT_SECRET}
+      - GMAIL_REFRESH_TOKEN=${GMAIL_REFRESH_TOKEN}
+      - GMAIL_USER=${GMAIL_USER:-}
 
       # Optional environment variables
       - LUNCHMONEY_ASSET_ID=${LUNCHMONEY_ASSET_ID:-}
@@ -53,8 +55,10 @@ services:
     profiles: ["cli"]
     environment:
       - LUNCHMONEY_TOKEN=${LUNCHMONEY_TOKEN}
-      - FINTOC_API_KEY=${FINTOC_API_KEY}
-      - FINTOC_LINK_ID=${FINTOC_LINK_ID}
+      - GMAIL_CLIENT_ID=${GMAIL_CLIENT_ID}
+      - GMAIL_CLIENT_SECRET=${GMAIL_CLIENT_SECRET}
+      - GMAIL_REFRESH_TOKEN=${GMAIL_REFRESH_TOKEN}
+      - GMAIL_USER=${GMAIL_USER:-}
       - LUNCHMONEY_ASSET_ID=${LUNCHMONEY_ASSET_ID:-}
       - DAYS_TO_SYNC=${DAYS_TO_SYNC:-7}
       - CURRENCY_CODE=${CURRENCY_CODE:-CLP}

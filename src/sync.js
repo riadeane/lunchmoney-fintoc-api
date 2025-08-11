@@ -1,18 +1,19 @@
 const chalk = require('chalk');
 const axios = require('axios');
-const { fetchFintocTransactions } = require('./fetchFintoc');
+const { fetchBancoChileEmails } = require('./fetchGmail');
 const { fetchTransactions } = require('./fetchLM');
 const { assignCategoryId } = require('./categorize');
-const { 
-  withRetry, 
-  shouldRetryHttpError, 
+const {
+  withRetry,
+  shouldRetryHttpError,
   generateTransactionFingerprint,
   sanitizeErrorForLogging,
   batchArray
 } = require('./utils');
 
 /**
- * Sync recent Fintoc movements to Lunch Money.
+ * Sync recent movements to Lunch Money from Banco de Chile credit card
+ * notification emails retrieved from Gmail.
  *
  * @param {Object} options
  * @param {Object} options.config Configuration object returned by loadConfig().
@@ -21,40 +22,48 @@ const {
 async function sync({ config, dryRun = false }) {
   const {
     lunchmoneyToken,
-    finocApiKey,
-    finocLinkId,
     daysToSync,
     categoryRules,
     currency,
-    lunchmoneyAssetId
+    lunchmoneyAssetId,
+    gmailClientId,
+    gmailClientSecret,
+    gmailRefreshToken,
+    gmailUser
   } = config;
+  let movements = [];
 
-  // Fetch recent Fintoc movements with retry logic
-  let finMovements;
-  try {
-    finMovements = await withRetry(
-      () => fetchFintocTransactions({
-        apiKey: finocApiKey,
-        linkId: finocLinkId,
-        daysToSync
-      }),
-      3,
-      1000,
-      shouldRetryHttpError
-    );
-  } catch (err) {
-    const sanitizedError = sanitizeErrorForLogging(err, { operation: 'fetch_fintoc' });
-    console.error(chalk.red(`Error fetching Fintoc movements: ${err.message}`));
-    console.error('Details:', JSON.stringify(sanitizedError, null, 2));
+  // Fetch Gmail Banco de Chile transactions if configured
+  if (gmailClientId && gmailClientSecret && gmailRefreshToken) {
+    try {
+      const gmailTx = await withRetry(
+        () =>
+          fetchBancoChileEmails({
+            clientId: gmailClientId,
+            clientSecret: gmailClientSecret,
+            refreshToken: gmailRefreshToken,
+            user: gmailUser,
+            daysToSync
+          }),
+        3,
+        1000,
+        shouldRetryHttpError
+      );
+      console.log(chalk.blue(`Found ${gmailTx.length} Gmail transactions to process`));
+      movements.push(...gmailTx);
+    } catch (err) {
+      const sanitizedError = sanitizeErrorForLogging(err, { operation: 'fetch_gmail' });
+      console.error(chalk.red(`Error fetching Gmail transactions: ${err.message}`));
+      console.error('Details:', JSON.stringify(sanitizedError, null, 2));
+    }
+  }
+
+  if (movements.length === 0) {
+    console.log(chalk.yellow('No transactions found in the given period.'));
     return;
   }
 
-  if (finMovements.length === 0) {
-    console.log(chalk.yellow('No Fintoc transactions found in the given period.'));
-    return;
-  }
-
-  console.log(chalk.blue(`Found ${finMovements.length} Fintoc transactions to process`));
+  console.log(chalk.blue(`Processing ${movements.length} transaction(s)`));
 
   // Determine date range for checking duplicates
   const endDate = new Date();
@@ -104,7 +113,7 @@ async function sync({ config, dryRun = false }) {
   const skippedDuplicates = [];
   const processingErrors = [];
 
-  for (const movement of finMovements) {
+  for (const movement of movements) {
     try {
       // Check for duplicates using both methods
       const simpleKey = `${movement.date}-${Number(movement.amount).toFixed(2)}`;
@@ -200,7 +209,7 @@ async function sync({ config, dryRun = false }) {
     console.log(chalk.yellow('No new transactions to sync.'));
     return {
       success: true,
-      processed: finMovements.length,
+      processed: movements.length,
       inserted: 0,
       skipped: skippedDuplicates.length,
       errors: processingErrors.length
@@ -218,7 +227,7 @@ async function sync({ config, dryRun = false }) {
     }
     return {
       success: true,
-      processed: finMovements.length,
+      processed: movements.length,
       inserted: newTransactions.length,
       skipped: skippedDuplicates.length,
       errors: processingErrors.length,
@@ -298,7 +307,7 @@ async function sync({ config, dryRun = false }) {
 
   return {
     success: insertionErrors.length === 0,
-    processed: finMovements.length,
+    processed: movements.length,
     inserted: totalInserted,
     skipped: skippedDuplicates.length,
     errors: processingErrors.length + insertionErrors.length,

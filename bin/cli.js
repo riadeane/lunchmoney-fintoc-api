@@ -100,8 +100,10 @@ async function run() {
     process.exit(1);
   }
 
-  if (!config.finocApiKey || !config.finocLinkId) {
-    console.error('Error: missing Fintoc API key or link ID. Set FINTOC_API_KEY and FINTOC_LINK_ID in your .env file.');
+  if (!config.gmailClientId || !config.gmailClientSecret || !config.gmailRefreshToken) {
+    console.error(
+      'Error: missing Gmail credentials. Set GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET and GMAIL_REFRESH_TOKEN in your .env file.'
+    );
     process.exit(1);
   }
 
